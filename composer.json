@@ -1,0 +1,15 @@
+{
+    "name": "kevinvennitti/layoutgrid",
+    "description": "Layout Grid for Kirby",
+    "type": "kirby-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kevin Vennitti",
+            "email": "hello@kevinvennitti.com"
+        }
+    ],
+    "require": {
+        "getkirby/composer-installer": "^1.1"
+    }
+}

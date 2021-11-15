@@ -1,0 +1,28 @@
+name: Layout Grid
+icon: grid
+fields:
+  layoutgridblocksforfieldsets:
+    type: blocks
+    fieldsets:
+      - heading
+      - text
+      - image
+      - button
+    #  - layoutgrid
+      - quote
+      - video
+      - list
+      - gallery
+  layoutgridstructure:
+    type: structure
+    fields:
+      layoutgridblocks:
+        type: blocks
+      grid_row_start:
+        type: text
+      grid_column_start:
+        type: text
+      grid_row_end:
+        type: text
+      grid_column_end:
+        type: text
