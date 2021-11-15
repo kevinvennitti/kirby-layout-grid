@@ -3,11 +3,12 @@ icon: grid
 fields:
   layoutgridblocksforfieldsets:
     type: blocks
+    # Remember to set the same blocks (except layoutgrid)
+    # in Kirby page blueprint
     fieldsets:
       - heading
       - text
       - image
-      - button
     #  - layoutgrid
       - quote
       - video
@@ -22,7 +23,7 @@ fields:
         type: text
       grid_column_start:
         type: text
-      grid_row_end:
+      grid_row_span:
         type: text
-      grid_column_end:
+      grid_column_span:
         type: text

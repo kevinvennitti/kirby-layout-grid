@@ -4,8 +4,26 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("div", { staticClass: "layout-grid-container layout-grid", attrs: { "id": "layout-grid-frame" }, on: { "mousedown": _vm.preventSelect } }, _vm._l(_vm.content.layoutgridstructure, function(itemstructure) {
-      return _c("div", { staticClass: "layout-grid-item", style: { gridColumnStart: itemstructure.grid_column_start, gridRowStart: itemstructure.grid_row_start, gridColumnEnd: "span " + itemstructure.grid_column_end, gridRowEnd: "span " + itemstructure.grid_row_end }, on: { "mousedown": _vm.preventSelect, "mouseup": _vm.savePosition } }, [_c("k-blocks", { ref: "blocks", refInFor: true, attrs: { "value": itemstructure.layoutgridblocks, "fieldsets": _vm.field("layoutgridblocksforfieldsets").fieldsets, "endpoints": _vm.endpoints, "group": "layout" }, on: { "input": function($event) {
+    return _c("div", { staticClass: "layout-grid-container layout-grid", attrs: { "id": "layout-grid-frame" }, on: { "mousedown": _vm.preventSelect } }, _vm._l(_vm.content.layoutgridstructure, function(itemstructure, index) {
+      return _c("div", { ref: "layout-grid-group", refInFor: true, staticClass: "layout-grid-item", style: { gridColumnStart: itemstructure.grid_column_start, gridRowStart: itemstructure.grid_row_start, gridColumnEnd: "span " + itemstructure.grid_column_span, gridRowEnd: "span " + itemstructure.grid_row_span }, on: { "mousedown": _vm.preventSelect, "mouseup": function($event) {
+        return _vm.savePosition(itemstructure, index);
+      } } }, [_c("k-text-field", { attrs: { "label": "grid_row_start", "value": _vm.getStructureValue(itemstructure, "grid_row_start") }, on: { "input": function($event) {
+        return _vm.$emit("update", $event);
+      } }, model: { value: itemstructure.grid_row_start, callback: function($$v) {
+        _vm.$set(itemstructure, "grid_row_start", $$v);
+      }, expression: "itemstructure.grid_row_start" } }), _c("k-text-field", { attrs: { "label": "grid_column_start", "value": _vm.getStructureValue(itemstructure, "grid_column_start") }, on: { "input": function($event) {
+        return _vm.$emit("update", $event);
+      } }, model: { value: itemstructure.grid_column_start, callback: function($$v) {
+        _vm.$set(itemstructure, "grid_column_start", $$v);
+      }, expression: "itemstructure.grid_column_start" } }), _c("k-text-field", { attrs: { "label": "grid_row_span", "value": _vm.getStructureValue(itemstructure, "grid_row_span") }, on: { "input": function($event) {
+        return _vm.$emit("update", $event);
+      } }, model: { value: itemstructure.grid_row_span, callback: function($$v) {
+        _vm.$set(itemstructure, "grid_row_span", $$v);
+      }, expression: "itemstructure.grid_row_span" } }), _c("k-text-field", { attrs: { "label": "grid_column_span", "value": _vm.getStructureValue(itemstructure, "grid_column_span") }, on: { "input": function($event) {
+        return _vm.$emit("update", $event);
+      } }, model: { value: itemstructure.grid_column_span, callback: function($$v) {
+        _vm.$set(itemstructure, "grid_column_span", $$v);
+      }, expression: "itemstructure.grid_column_span" } }), _c("k-blocks", { ref: "blocks", refInFor: true, attrs: { "value": itemstructure.layoutgridblocks, "fieldsets": _vm.field("layoutgridblocksforfieldsets").fieldsets, "endpoints": _vm.endpoints, "group": "layout" }, on: { "input": function($event) {
         return _vm.$emit("update", $event);
       } } }), _c("div", { staticClass: "layout-grid-item-drag-handle" }, [_vm._v(":::")]), _c("div", { staticClass: "layout-grid-item-resize-handle layout-grid-item-resize-handle-w", attrs: { "data-resize": "w" } }), _c("div", { staticClass: "layout-grid-item-resize-handle layout-grid-item-resize-handle-e", attrs: { "data-resize": "e" } }), _c("div", { staticClass: "layout-grid-item-resize-handle layout-grid-item-resize-handle-n", attrs: { "data-resize": "n" } }), _c("div", { staticClass: "layout-grid-item-resize-handle layout-grid-item-resize-handle-s", attrs: { "data-resize": "s" } })], 1);
     }), 0);
@@ -77,18 +95,30 @@
       };
     },
     methods: {
+      getStructureValue(structureItem, property) {
+        return structureItem[property];
+      },
       preventSelect(event) {
         if (event.detail > 1) {
           event.preventDefault();
         }
       },
-      savePosition(event) {
+      savePosition(structureItem, index) {
         console.log("save position");
-        console.log(this.$el.children);
-        for (let i = 0; i < this.$el.children.length; i++) {
-          let group = this.$el.children[i];
-          console.log(group.dataset.gridColumnStart);
+        let group = this.$refs["layout-grid-group"][index];
+        if (group.dataset.gridColumnStart !== void 0) {
+          structureItem.grid_column_start = group.dataset.gridColumnStart;
         }
+        if (group.dataset.gridRowStart !== void 0) {
+          structureItem.grid_row_start = group.dataset.gridRowStart;
+        }
+        if (group.dataset.gridColumnSpan !== void 0) {
+          structureItem.grid_column_span = group.dataset.gridColumnSpan;
+        }
+        if (group.dataset.gridRowSpan !== void 0) {
+          structureItem.grid_row_span = group.dataset.gridRowSpan;
+        }
+        this.update({});
       },
       debug() {
         console.log("this", this);
@@ -328,6 +358,9 @@
       this.item.rowStart = parseInt(this.getStyleProperty(this.item.DOM, "grid-row-start"));
       this.item.rowSpan = parseInt(this.getStyleProperty(this.item.DOM, "grid-row-end").replace("span ", ""));
       this.item.DOM.setAttribute("data-grid-column-start", this.item.columnStart);
+      this.item.DOM.setAttribute("data-grid-row-start", this.item.rowStart);
+      this.item.DOM.setAttribute("data-grid-column-span", this.item.columnSpan);
+      this.item.DOM.setAttribute("data-grid-row-span", this.item.rowSpan);
     }
     unsetItem() {
       this.item.DOM = null;

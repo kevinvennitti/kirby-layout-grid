@@ -1,23 +1,42 @@
 <template>
+  <!-- Contenant des groupes, calibre la grille -->
   <div id="layout-grid-frame" class="layout-grid-container layout-grid" @mousedown="preventSelect">
-<!--
-    <k-form
-     ref="form"
-     :autofocus="true"
-     :fields="fieldset.tabs.content.fields"
-     :value="$helper.clone(content)"
-     @input="$emit('update', $event)"
 
-   />
-   -->
+    <!-- Instance d'un groupe (est répété) -->
     <div
-    v-for="itemstructure in content.layoutgridstructure"
+    v-for="(itemstructure, index) in content.layoutgridstructure"
     class="layout-grid-item"
+    ref="layout-grid-group"
     @mousedown="preventSelect"
-    @mouseup="savePosition"
-    :style="{ gridColumnStart: itemstructure.grid_column_start, gridRowStart: itemstructure.grid_row_start,  gridColumnEnd: 'span '+itemstructure.grid_column_end,  gridRowEnd: 'span '+itemstructure.grid_row_end }">
+    @mouseup="savePosition(itemstructure, index)"
+    :style="{ gridColumnStart: itemstructure.grid_column_start, gridRowStart: itemstructure.grid_row_start,  gridColumnEnd: 'span '+itemstructure.grid_column_span,  gridRowEnd: 'span '+itemstructure.grid_row_span }">
       <!-- <div style="color:green;font-size:10px;">{{ itemstructure }}</div> -->
 
+      <!-- 4 champs text pour débugger la position -->
+      <k-text-field
+        label="grid_row_start"
+        v-model="itemstructure.grid_row_start"
+        :value="getStructureValue(itemstructure, 'grid_row_start')"
+        @input="$emit('update', $event)"
+      />
+      <k-text-field
+        label="grid_column_start"
+        v-model="itemstructure.grid_column_start"
+        :value="getStructureValue(itemstructure, 'grid_column_start')"
+        @input="$emit('update', $event)"
+      />
+      <k-text-field
+        label="grid_row_span"
+        v-model="itemstructure.grid_row_span"
+        :value="getStructureValue(itemstructure, 'grid_row_span')"
+        @input="$emit('update', $event)"
+      />
+      <k-text-field
+        label="grid_column_span"
+        v-model="itemstructure.grid_column_span"
+        :value="getStructureValue(itemstructure, 'grid_column_span')"
+        @input="$emit('update', $event)"
+      />
 
       <k-blocks
         ref="blocks"
@@ -64,9 +83,21 @@ export default {
   },
 
   methods: {
+    getStructureValue(structureItem, property) {
+      return structureItem[property];
+    },
+
+    /*
+    // content of fields
+    console.log(this.content.layoutgridstructure);//.layoutgridblocks); //.field('layoutgridstructure.fields.layoutgridblocks'));
+
+    // blueprint of fields
+    console.log(this.field('layoutgridstructure').fields.layoutgridblocks);//.layoutgridblocks); //.field('layoutgridstructure.fields.layoutgridblocks'));
+    */
+
     /*
     gridArea() {
-      return this.grid_column_start+" / "+this.grid_row_start+" / "+this.grid_column_end+" / "+this.grid_row_end;
+      return this.grid_column_start+" / "+this.grid_row_start+" / "+this.grid_column_span+" / "+this.grid_row_span;
     },
     */
     preventSelect (event) {
@@ -74,13 +105,46 @@ export default {
         event.preventDefault()
       }
     },
-    savePosition(event){
+    savePosition(structureItem, index){
       console.log('save position');
-      console.log(this.$el.children);
+      /*
+      console.log('structureItem', structureItem); // data
+      console.log(this);
+      console.log('index', index);
+      console.log(this.$el.children); // dom
+      */
+
+      let group = this.$refs['layout-grid-group'][index];
+
+      if (group.dataset.gridColumnStart !== undefined) {
+        structureItem.grid_column_start = group.dataset.gridColumnStart;
+      }
+
+      if (group.dataset.gridRowStart !== undefined) {
+        structureItem.grid_row_start = group.dataset.gridRowStart;
+      }
+
+      if (group.dataset.gridColumnSpan !== undefined) {
+        structureItem.grid_column_span = group.dataset.gridColumnSpan;
+      }
+
+      if (group.dataset.gridRowSpan !== undefined) {
+        structureItem.grid_row_span = group.dataset.gridRowSpan;
+      }
+
+      this.update({});
+      /*
       for (let i = 0; i < this.$el.children.length; i++) {
         let group = this.$el.children[i];
         console.log(group.dataset.gridColumnStart);
+
+        console.log(this.$refs['layout-grid-group'][index]);
+
+        if (group.dataset.gridColumnStart !== undefined) {
+          this.content.layoutgridstructure[i].grid_column_start = group.dataset.gridColumnStart;
+        }
       }
+      */
     },
     debug()  {
       console.log('this', this);
@@ -460,6 +524,9 @@ class LayoutGridPlugin {
     this.item.rowSpan = parseInt(this.getStyleProperty(this.item.DOM, 'grid-row-end').replace('span ',''));
 
     this.item.DOM.setAttribute('data-grid-column-start', this.item.columnStart);
+    this.item.DOM.setAttribute('data-grid-row-start', this.item.rowStart);
+    this.item.DOM.setAttribute('data-grid-column-span', this.item.columnSpan);
+    this.item.DOM.setAttribute('data-grid-row-span', this.item.rowSpan);
   }
 
   unsetItem() {
